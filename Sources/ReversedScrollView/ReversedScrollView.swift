@@ -67,7 +67,7 @@ public struct ReversedScrollView<Content: View>: View {
     }
 }
 
-struct ReversedScrollView_Previews: PreviewProvider {
+fileprivate struct ReversedScrollView_Previews: PreviewProvider {
     static var previews: some View {
         ReversedScrollView(.vertical, leadingSpace: 50) {
             ForEach(0..<5) { item in
@@ -80,39 +80,3 @@ struct ReversedScrollView_Previews: PreviewProvider {
         }
     }
 }
-
-public struct Stack<Content: View>: View {
-    fileprivate var axis: Axis.Set
-    fileprivate var content: Content
-    
-    public init(_ axis: Axis.Set = .vertical, @ViewBuilder builder: () -> Content) {
-        self.axis = axis
-        self.content = builder()
-    }
-    
-    public var body: some View {
-        switch axis {
-        case .horizontal:
-            HStack {
-                content
-            }
-        case .vertical:
-            VStack {
-                content
-            }
-        default:
-            VStack {
-                content
-            }
-        }
-    }
-}
-
-public struct ViewOffsetKey: PreferenceKey {
-    public typealias Value = CGFloat
-    public static var defaultValue = CGFloat.zero
-    public static func reduce(value: inout Value, nextValue: () -> Value) {
-        value += nextValue()
-    }
-}
-
