@@ -12,21 +12,19 @@ public struct ReversedScrollView<Content: View>: View {
     fileprivate var axis: Axis.Set
     fileprivate var showsIndicator: Bool
     fileprivate var leadingSpace: CGFloat
-    fileprivate var content: Content
-    fileprivate var proxy: GeometryProxy?
+    
+    @ViewBuilder fileprivate var content: () -> Content
     
     public init(
         _ axis: Axis.Set = .vertical,
         showsIndicator: Bool = false,
         leadingSpace: CGFloat = 10,
-        proxy: GeometryProxy? = nil,
-        @ViewBuilder builder: () -> Content
+        @ViewBuilder content: @escaping () -> Content
     ) {
         self.axis = axis
         self.showsIndicator = showsIndicator
         self.leadingSpace = leadingSpace
-        self.proxy = proxy
-        self.content = builder()
+        self.content = content
     }
     
     fileprivate func minWidth(in proxy: GeometryProxy, for axis: Axis.Set) -> CGFloat? {
@@ -38,30 +36,16 @@ public struct ReversedScrollView<Content: View>: View {
     }
     
     public var body: some View {
-        
-        if let proxy = proxy {
+        GeometryReader { proxy in
             ScrollView(axis, showsIndicators: showsIndicator) {
                 Stack(axis) {
                     Spacer(minLength: leadingSpace)
-                    content
+                    content()
                 }
                 .frame(
                    minWidth: minWidth(in: proxy, for: axis),
                    minHeight: minHeight(in: proxy, for: axis)
                 )
-            }
-        } else {
-            GeometryReader { proxy in
-                ScrollView(axis, showsIndicators: showsIndicator) {
-                    Stack(axis) {
-                        Spacer(minLength: leadingSpace)
-                        content
-                    }
-                    .frame(
-                       minWidth: minWidth(in: proxy, for: axis),
-                       minHeight: minHeight(in: proxy, for: axis)
-                    )
-                }
             }
         }
     }
